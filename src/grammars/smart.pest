@@ -1,0 +1,32 @@
+WHITESPACE = _{ " " | "\t" | "\n" | "\r" }
+COMMENT = _{ "#" ~ (!"\n" ~ ANY)* }
+
+program = { SOI ~ item* ~ EOI }
+
+item = { let_binding | expr }
+let_binding = { "let" ~ identifier ~ "=" ~ expr ~ ";" }
+
+expr = { lambda | application | atom }
+
+lambda = { "\\" ~ identifier ~ "." ~ expr }
+
+application = { atom ~ atom+ }
+
+atom = { 
+    "(" ~ expr ~ ")" |
+    builtin |
+    identifier
+}
+
+builtin = { 
+    "AS_NAT" | 
+    "AS_BOOL" | 
+    "AS_LIST" |
+    "SUCC" |
+    "ZERO" |
+    "TRUE" |
+    "FALSE" |
+    "ADD"
+}
+
+identifier = { (ASCII_ALPHA | "_") ~ (ASCII_ALPHANUMERIC | "_")* }
