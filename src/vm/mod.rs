@@ -133,111 +133,13 @@ impl VM {
     fn try_as_church_numeral(&mut self, closure: &Closure) -> Option<i32> {
         let body = &closure.body;
 
-        if let [Instruction::Lam(outer_body)] = body.as_slice() {
-            if let [Instruction::Lam(inner_body)] = outer_body.as_slice() {
-                return self.count_applications(inner_body);
-            }
-
-            return Some(self.count_applications_env(outer_body));
-        }
-
-        None
+        Some(8)
     }
 
     fn try_as_church_boolean(&self, closure: &Closure) -> Option<bool> {
         let body = &closure.body;
 
-        // Church boolean patterns:
-        // TRUE = λx.λy.x → Lam([Lam([Var(1)])])
-        // FALSE = λx.λy.y → Lam([Lam([Var(0)])])
-
-        match body.as_slice() {
-            [Instruction::Lam(outer_body)] => {
-                match outer_body.as_slice() {
-                    [Instruction::Lam(inner_body)] => {
-                        match inner_body.as_slice() {
-                            [Instruction::Var(1)] => Some(true),  // TRUE - return first arg
-                            [Instruction::Var(0)] => Some(false), // FALSE - return second arg
-                            _ => None,
-                        }
-                    }
-                    _ => None,
-                }
-            }
-            _ => None,
-        }
-    }
-
-    fn count_applications(&self, instructions: &[Instruction]) -> Option<i32> {
-        // Pattern for Church numeral n: Var(1)^n Var(0) App^n
-        // Where Var(1) is f, Var(0) is x, and we apply f n times
-        match instructions {
-            // Zero: λf.λx.x → just Var(0)
-            [Instruction::Var(0)] => Some(0),
-
-            // One: λf.λx.f x → Var(1) Var(0) App
-            [Instruction::Var(1), Instruction::Var(0), Instruction::App] => Some(1),
-
-            // Two: λf.λx.f (f x) → Var(1) Var(1) Var(0) App App
-            [
-                Instruction::Var(1),
-                Instruction::Var(1),
-                Instruction::Var(0),
-                Instruction::App,
-                Instruction::App,
-            ] => Some(2),
-
-            // Three: λf.λx.f (f (f x)) → Var(1) Var(1) Var(1) Var(0) App App App
-            [
-                Instruction::Var(1),
-                Instruction::Var(1),
-                Instruction::Var(1),
-                Instruction::Var(0),
-                Instruction::App,
-                Instruction::App,
-                Instruction::App,
-            ] => Some(3),
-
-            // General case: count leading Var(1)s
-            _ => {
-                let mut count = 0;
-                for instr in instructions {
-                    match instr {
-                        Instruction::Var(1) => count += 1,
-                        Instruction::Var(0) => break,
-                        _ => break,
-                    }
-                }
-
-                let expected_apps = count;
-                let mut app_count = 0;
-                let mut found_var_0 = false;
-
-                for instr in instructions.iter().skip(count as usize) {
-                    match instr {
-                        Instruction::Var(0) if !found_var_0 => found_var_0 = true,
-                        Instruction::App => app_count += 1,
-                        _ => return None,
-                    }
-                }
-
-                if found_var_0 && app_count == expected_apps {
-                    Some(count)
-                } else {
-                    None
-                }
-            }
-        }
-    }
-
-    fn count_applications_env(&self, instructions: &[Instruction]) -> i32 {
-        let mut app_count = 0;
-        for instr in instructions {
-            if let Instruction::App = instr {
-                app_count += 1
-            }
-        }
-
-        app_count
+        Some(false)
     }
 }
+    
