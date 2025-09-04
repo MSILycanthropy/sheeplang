@@ -1,15 +1,12 @@
-use sheeplang::{parser::smart::SheepParser, vm::{Instruction, VM}};
+use sheeplang::compiler::compile_and_run;
 
 fn main() {
-    let code = "
-let id = \\x.x;
-let add = \\m.\\n.\\f.\\x.m f (n f x);
-let two = \\f.\\x.f (f x);
-let three = \\f.\\x.f (f (f x));
+    let code = r#"
+    let id = \x.x;
+    let two = \f.\x.f (f x);
+    let three = SUCC two;
+    ADD two three AS_NAT
+"#;
 
-add two three AS_NAT";
-
-    let parser = SheepParser::parse_program(code);
-
-    dbg!(parser);
+    compile_and_run(code).unwrap();
 }

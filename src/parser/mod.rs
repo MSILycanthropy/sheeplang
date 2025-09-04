@@ -18,4 +18,3 @@ pub struct Program {
     pub statements: Vec<Statement>,
     pub main_expr: Option<Expr>,
 }
-

@@ -1,23 +1,17 @@
 use std::collections::HashMap;
 
 use crate::{
-    parser::{Expr, Program, Statement},
-    vm::Instruction,
+    parser::{Expr, Program, Statement, smart::SheepParser},
+    vm::{self, Instruction},
 };
 
+#[derive(Default)]
 pub struct Compiler {
     var_stack: Vec<String>,
     bindings: HashMap<String, Vec<Instruction>>,
 }
 
 impl Compiler {
-    pub fn new() -> Self {
-        Compiler {
-            var_stack: vec![],
-            bindings: HashMap::new(),
-        }
-    }
-
     pub fn compile(&mut self, program: Program) -> Result<Vec<Instruction>, String> {
         for statement in program.statements {
             self.compile_statement(statement)?;
@@ -72,7 +66,6 @@ impl Compiler {
                 let func_instructions = self.compile_expr(func)?;
                 let arg_instructions = self.compile_expr(arg)?;
 
-                // Push function, then argument, then Apply
                 instructions.extend(func_instructions);
                 instructions.extend(arg_instructions);
                 instructions.push(Instruction::App);
@@ -139,4 +132,17 @@ impl Compiler {
             _ => Err(format!("Unknown builtin: {}", name)),
         }
     }
+}
+
+pub fn compile_and_run(program_text: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let program = SheepParser::parse_program(program_text)?;
+
+    let mut compiler = Compiler::default();
+    let instructions = compiler.compile(program)?;
+
+    let mut vm = vm::VM::default();
+    let result = vm.run(&instructions)?;
+
+    println!("Result: {}", result);
+    Ok(())
 }

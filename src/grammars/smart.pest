@@ -12,15 +12,15 @@ lambda = { "\\" ~ identifier ~ "." ~ expr }
 
 application = { atom ~ atom+ }
 
-atom = { 
+atom = {
     "(" ~ expr ~ ")" |
     builtin |
     identifier
 }
 
-builtin = { 
-    "AS_NAT" | 
-    "AS_BOOL" | 
+builtin = {
+    "AS_NAT" |
+    "AS_BOOL" |
     "AS_LIST" |
     "SUCC" |
     "ZERO" |
@@ -29,4 +29,4 @@ builtin = {
     "ADD"
 }
 
-identifier = { (ASCII_ALPHA | "_") ~ (ASCII_ALPHANUMERIC | "_")* }
+identifier = @{ (ASCII_ALPHA | "_") ~ (ASCII_ALPHANUMERIC | "_")* }

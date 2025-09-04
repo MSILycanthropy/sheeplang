@@ -7,14 +7,14 @@ use crate::parser::{Expr, Program, Statement};
 #[grammar = "grammars/smart.pest"]
 pub struct SheepParser;
 
-type ParserResult = Result<Program, pest::error::Error<Rule>>;
+type ParserResult = Result<Program, Box<pest::error::Error<Rule>>>;
 
 impl SheepParser {
-    pub fn parse_program(input: &str) -> ParserResult{
+    pub fn parse_program(input: &str) -> ParserResult {
         let pairs = SheepParser::parse(Rule::program, input)?;
         let mut statements = Vec::new();
         let mut main_expr = None;
-        
+
         for pair in pairs {
             match pair.as_rule() {
                 Rule::program => {
@@ -29,19 +29,22 @@ impl SheepParser {
                                     Rule::expr => {
                                         main_expr = Some(parse_expr(item));
                                     }
-                                    _ => unreachable!()
+                                    _ => unreachable!(),
                                 }
                             }
                             Rule::EOI => {}
-                            _ => unreachable!()
+                            _ => unreachable!(),
                         }
                     }
                 }
-                _ => unreachable!()
+                _ => unreachable!(),
             }
         }
-        
-        Ok(Program { statements, main_expr })
+
+        Ok(Program {
+            statements,
+            main_expr,
+        })
     }
 }
 
@@ -65,12 +68,12 @@ fn parse_expr(pair: pest::iterators::Pair<Rule>) -> Expr {
         Rule::application => {
             let mut inner = pair.into_inner();
             let mut expr = parse_expr(inner.next().unwrap());
-            
+
             for arg_pair in inner {
                 let arg = Box::new(parse_expr(arg_pair));
-                expr = Expr::App { 
-                    func: Box::new(expr), 
-                    arg 
+                expr = Expr::App {
+                    func: Box::new(expr),
+                    arg,
                 };
             }
             expr
@@ -83,6 +86,6 @@ fn parse_expr(pair: pest::iterators::Pair<Rule>) -> Expr {
             let inner = pair.into_inner().next().unwrap();
             parse_expr(inner)
         }
-        _ => unreachable!("Unexpected rule: {:?}", pair.as_rule())
+        _ => unreachable!("Unexpected rule: {:?}", pair.as_rule()),
     }
 }
