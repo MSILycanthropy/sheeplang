@@ -19,9 +19,8 @@ atom = {
 }
 
 builtin = {
-    "AS_NAT" |
-    "AS_BOOL" |
-    "AS_LIST" |
+    "PEEK_NUM" |
+    "PEEK_BOOL" |
     "SUCC" |
     "ZERO" |
     "TRUE" |

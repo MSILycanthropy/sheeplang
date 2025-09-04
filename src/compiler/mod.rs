@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::{
     parser::{Expr, Program, Statement, smart::SheepParser},
-    vm::{self, Instruction},
+    vm::{self, Instruction, PeekAs},
 };
 
 #[derive(Default)]
@@ -125,9 +125,7 @@ impl Compiler {
                 Instruction::Var(0),
             ])])]),
 
-            "AS_NAT" | "AS_BOOL" | "AS_LIST" => {
-                Ok(vec![Instruction::Lam(vec![Instruction::Var(0)])])
-            }
+            "PEEK_NUM" | "PEEK_BOOL" => Ok(vec![Instruction::Peek(PeekAs::from(name))]),
 
             _ => Err(format!("Unknown builtin: {}", name)),
         }
